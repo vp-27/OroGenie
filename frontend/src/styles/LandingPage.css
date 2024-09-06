@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100..900&family=Raleway:wght@100..900&display=swap');
+:root {
+    --primary-color: goldenrod;
+    --secondary-color: black;
+    --tertiary-color: #e0e0e0;
+}
+
+/* Basic global reset and box-sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.landing-page {
+    font-family: "Raleway", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    background-color: var(--secondary-color);
+    color: var(--tertiary-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+/* Header styles */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+header h1 {
+    margin: 0.5rem;
+}
+
+header h1 a {
+    text-decoration: none;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Navigation styles */
+nav ul {
+    list-style-type: none;
+    display: flex;
+    margin: 0.5rem;
+    padding: 0;
+}
+
+nav ul li {
+    margin-left: 1vw;
+}
+
+.landing-page nav a {
+    position: relative;
+    border-radius: 20px;
+    padding: 5px 10px;
+    color: white;
+    text-decoration: none;
+    text-align: right;
+    overflow: hidden;
+    display: inline-block;
+    transition: color 0.45s ease;
+    box-shadow: 1px 1px 7px var(--shadow-dark), -1px -1px 7px var(--shadow-light);
+    
+}
+
+.landing-page nav a:hover {
+    box-shadow: 1px 1px 20px var(--shadow-dark), -1px -1px 20px var(--primary-color);
+}
+
+/* Main content styles */
+main {
+    padding-top: 5px;
+    padding-bottom: 200px;
+    /* background-color: red; */
+}
+
+.hero {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.hero.full-screen {
+    height: 100vh;
+}
+
+.hero-content {
+    text-align: center;
+    z-index: 1;
+}
+
+#greeting-text {
+    color: var(--tertiary-color);
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+#greeting-text.orogenie {
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #e0e0e0;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.golden-ball {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle at 30% 30%, var(--primary-color), #8a5a00);
+    border-radius: 50%;
+    position: absolute;
+    animation: fluidMotion 8s ease-in-out infinite alternate, float 6s ease-in-out infinite;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+    overflow: hidden;
+}
+
+.golden-ball.orogenie {
+    transition: transform 0.3s ease;
+    background-image: url('../images/logo.jpeg');
+    background-size: contain;
+    background-position: bottom;
+    filter: brightness(70%);
+    transform: translateY(-90px);
+    animation: fluidMotion 8s ease-in-out infinite alternate, float 6s ease-in-out infinite, imageChange 0.2s 1;
+    box-shadow: 0 0 30px rgba(255, 217, 0, 0.8);
+}
+
+@keyframes imageChange {
+    0%, 100% {
+        background-image: url('../images/logo.jpeg');
+        filter: brightness(100%);
+    }
+    25% {
+        background-image: url('../images/logo.jpeg');
+        filter: brightness(90%);
+    }
+    50% {
+        background-image: url('../images/logo.jpeg');
+        filter: brightness(80%);
+    }
+    75% {
+        background-image: url('../images/logo.jpeg');
+        filter: brightness(75%);
+    }
+    100% {
+        background-image: url('../images/logo.jpeg');
+        filter: brightness(70%);
+    }
+}
+
+@keyframes fluidMotion {
+    0% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+    25% {
+        border-radius: 50% 60% 40% 70% / 40% 50% 60% 30%;
+    }
+    50% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+    75% {
+        border-radius: 40% 70% 50% 60% / 60% 40% 70% 50%;
+    }
+    100% {
+        border-radius: 40% 60% 30% 70% / 70% 40% 50% 30%;
+    }
+}
+
+/* Continue floating animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(10px) rotate(0);
+    }
+    50% {
+        transform: translateY(-10px) rotate(0deg);
+    }
+}
+
+/* Features section styles */
+.features {
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem;
+    background-color: #1a1a1a;
+    margin-top: -100px;
+}
+
+.feature {
+    text-align: center;
+    max-width: 30%;
+}
+
+.feature h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.feature p {
+    font-size: 1rem;
+    color: var(--tertiary-color);
+}
+
+/* Parallax sections */
+.advertising {
+    padding: 4rem 2rem;
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    background-color: var(--secondary-color);
+}
+
+.parallax {
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+}
+
+.parallax-algo {
+    background-image: url('../images/bullbear.jpeg');
+    filter: brightness(50%);
+}
+
+.parallax-ai {
+    background-image: url('../images/black-gold-silk.jpeg');
+}
+
+.parallax-data {
+    background-image: url('../images/bullbear.jpeg');
+}
+
+.parallax-community {
+    background-image: url('../images/black-gold-silk.jpeg');
+}
+
+/* Footer styles */
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #111;
+    color: #fff;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+}

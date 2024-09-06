@@ -1,0 +1,286 @@
+:root {
+    --background: #f0f0f3; /* Light background color */
+    --primary: #daa520; /* Primary accent color */
+    --input-background: #f0f0f3; /* Input background color */
+    --input-border: #3333337e; /* Input border color */
+    --input-border-focus: #daa520; /* Focused input border color */
+    --text-color: #333; /* Dark text color */
+    --shadow-light: rgba(219, 219, 219, 0.6); /* Light shadow color */
+    --shadow-dark: rgba(0, 0, 0, 0.1); /* Dark shadow color */
+    --neomorphism-light: rgba(255, 255, 255, 0.8); /* Neomorphic light shadow */
+    --neomorphism-dark: rgba(0, 0, 0, 0.2); /* Neomorphic dark shadow */
+}
+
+/* Global Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.form-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--background);
+    padding: 2rem;
+}
+  
+.form-image {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 1rem; /* Space between image and form */
+}
+
+.form-image img {
+    margin-left: 100px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: -8px -8px 16px var(--neomorphism-light), 
+                8px 8px 16px var(--neomorphism-dark);
+}
+  
+.form-image video {
+    filter: brightness(80%);
+    margin-left: 100px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: -8px -8px 16px var(--neomorphism-light), 
+                8px 8px 16px var(--neomorphism-dark);
+}
+  
+.form-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+  
+.form {
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    background: var(--input-background);
+    border-radius: 16px;
+    box-shadow: -7px -7px 20px var(--neomorphism-light), 
+                7px 7px 20px var(--neomorphism-dark);
+    transition: all 0.3s ease-in-out;
+}
+  
+  /* Add media queries for responsiveness */
+@media (max-width: 768px) {
+    .form-container {
+        flex-direction: column;
+        padding: 1rem;
+}
+  
+.form-image {
+    padding-right: 0;
+    margin-bottom: 1.5rem; /* Space between image and form */
+    }
+}
+
+
+
+.form-heading {
+    margin-bottom: 1rem;
+    color: var(--primary);
+    text-align: center;
+    border-radius: 10px;
+}
+
+.name-fields {
+    display: flex;
+    justify-content: space-between;
+}
+
+.input-group {
+    position: relative;
+    margin: 1px; /* Add some space between input fields, especially for the name fields */
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--input-border);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.form-input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    background: var(--input-background);
+    color: var(--text-color);
+    outline: none;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.form-input:focus {
+    border: 2px solid var(--input-border-focus);
+    box-shadow: 0px 0px 5px var(--primary);
+}
+
+.form-label {
+    position: absolute;
+    left: 0.4rem;
+    top: .8rem;
+    background-color: var(--input-background);
+    color: #8c8c8c;
+    cursor: text;
+    transition: 250ms cubic-bezier(.79, 0, .16, .99);
+    padding: 0 .5rem;
+    pointer-events: none;
+}
+  
+
+.form-input:focus ~ .form-label,
+.form-input:not(:placeholder-shown) ~ .form-label {
+    top: -0.5rem;
+    font-size: 0.8rem;
+    left: 0.8rem;
+    color: var(--primary);
+    background-color: var(--input-background);
+}
+
+.form-input:not(:focus):not(:placeholder-shown) ~ .form-label {
+    top: -0.5rem;
+    font-size: 0.8rem;
+    left: 0.8rem;
+    color: var(--input-border);
+    background-color: var(--input-background);
+}
+
+.form-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: var(--input-border-focus);
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 7px 7px 20px var(--shadow-dark), -7px -7px 20px var(--shadow-light);
+}
+
+.form-button:hover {
+    background-color: #b8860b;
+}
+
+.form-message {
+    margin-top: 1rem;
+    color: var(--primary);
+    background-color: #e0e0e0;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 3px 3px 8px var(--shadow-dark), -3px -3px 8px var(--shadow-light);
+}
+
+/* Set autofill background color to be transparent */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-color) !important;
+    background-color: transparent !important;
+    box-shadow: 0 0 0px 1000px var(--input-bg) inset; /* Match your form background */
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Slider Styling */
+.input-group {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.range-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.range-style {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+    background: #f0f0f3;
+    box-shadow: inset 7px 7px 20px var(--shadow-dark), inset -7px -7px 20px var(--shadow-light);
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+/* .range-style:hover {
+    opacity: 1;
+} */
+
+.range-style::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 30px; /* Larger thumb */
+    height: 30px; /* Larger thumb */
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.2s;
+}
+
+.range-style::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.range-style::-moz-range-thumb {
+    width: 30px; /* Larger thumb */
+    height: 30px; /* Larger thumb */
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.2s;
+}
+
+.range-style::-moz-range-thumb:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.range-value {
+    font-family: 'Courier New', Courier, monospace;
+    margin-top: 0.5rem;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.redirect-link {
+    color: var(--text-color);
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.redirect-link a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.redirect-link a:hover {
+    text-decoration: underline;
+}
+
