@@ -29,30 +29,50 @@ We recommend using a dummy account for testing purposes. **If you plan to deploy
 
 To get started with OroGenie, follow these steps:
 
-1. Clone the repository:
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/orogenie.git
+   git clone https://github.com/vp-27/OroGenie
    cd orogenie
    ```
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. **Backend setup**:
+   - Navigate to the backend directory:
+     ```bash
+     cd backend
+     ```
+   - Install the backend dependencies:
+     ```bash
+     pip install -r requirements.txt
+     ```
+   - Set up your environment variables for Flask, JWT, and database configurations:
+     ```bash
+     export FLASK_APP=run.py
+     export SECRET_KEY='your-secret-key'
+     export JWT_SECRET_KEY='your-jwt-secret-key'
+     ```
+   - Run the Flask server:
+     ```bash
+     python3 run.py
+     ```
 
-3. Set up your environment variables for Flask, JWT, and database configurations:
-   ```bash
-   export FLASK_APP=app.py
-   export SECRET_KEY='your-secret-key'
-   export JWT_SECRET_KEY='your-jwt-secret-key'
-   ```
+3. **Frontend setup**:
+   - Navigate to the frontend directory:
+     ```bash
+     cd ../frontend
+     ```
+   - Install the frontend dependencies:
+     ```bash
+     npm install
+     ```
+   - Run the React frontend:
+     ```bash
+     npm start
+     ```
 
-4. Run the Flask development server:
-   ```bash
-   flask run
-   ```
+4. **Access the app**:
+   - Visit `http://localhost:3000` for the frontend.
+   - The backend runs on `http://127.0.0.1:5000`.
 
-5. Access the app by navigating to `http://127.0.0.1:5000` in your browser.
 
 ## What's Next?
 
