@@ -5,9 +5,11 @@ function TradingViewWidget({ symbol, darkMode, chartType }) {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (container.current) {
+      const currentContainer = container.current; // Store ref value
+
+      if (currentContainer) {
         // Clear any existing content in the container
-        container.current.innerHTML = '';
+        currentContainer.innerHTML = '';
 
         const script = document.createElement("script");
         script.type = "text/javascript";
@@ -64,7 +66,7 @@ function TradingViewWidget({ symbol, darkMode, chartType }) {
           });
         }
 
-        container.current.appendChild(script);
+        currentContainer.appendChild(script);
       }
     }, 100); // Add a 100ms delay to ensure DOM readiness
 
@@ -80,7 +82,7 @@ function TradingViewWidget({ symbol, darkMode, chartType }) {
     <div className="tradingview-widget-container" ref={container} style={{ height: "100%", width: "100%" }}>
       <div className="tradingview-widget-container__widget" style={{ height: "calc(100% - 32px)", width: "100%" }}></div>
       <div className="tradingview-widget-copyright">
-        <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+        <a href="https://www.tradingview.com/" rel="noopener noreferrer" target="_blank">
           <span className="blue-text">Track all markets on TradingView</span>
         </a>
       </div>
