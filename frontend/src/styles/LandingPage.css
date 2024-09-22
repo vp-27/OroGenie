@@ -224,39 +224,13 @@ main {
     color: var(--tertiary-color);
 }
 
-/* Parallax sections */
-.advertising {
-    padding: 4rem 2rem;
-    text-align: center;
-    color: white;
-    font-size: 2rem;
-    background-color: var(--secondary-color);
+.video-content iframe {
+    width: 100%;
+    height: 604px;
+    border-radius: 10px;
+    /* box-shadow: -8px -8px 16px var(--neomorphism-light), 8px 8px 16px var(--neomorphism-dark); */
 }
 
-.parallax {
-    background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    color: white;
-}
-
-.parallax-algo {
-    background-image: url('../images/bullbear.jpeg');
-    filter: brightness(50%);
-}
-
-.parallax-ai {
-    background-image: url('../images/black-gold-silk.jpeg');
-}
-
-.parallax-data {
-    background-image: url('../images/bullbear.jpeg');
-}
-
-.parallax-community {
-    background-image: url('../images/black-gold-silk.jpeg');
-}
 
 /* Footer styles */
 footer {

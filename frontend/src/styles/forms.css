@@ -284,3 +284,54 @@ input:-webkit-autofill:focus {
     text-decoration: underline;
 }
 
+
+.password-group {
+    position: relative;
+  }
+  
+  .password-popup {
+    text-align: left;
+    position: absolute;
+    top: 0;
+    left: calc(100% + 40px);
+    background: #f0f0f3;
+    box-shadow:  7px 7px 15px var(--shadow-dark),  -.5px -.5px 5px var(--primary);
+    /* border: 1px solid var(--input-border); */
+    border-radius: 5px;
+    padding: 10px;
+    width: 300px;
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+    z-index: 10;
+  }
+  
+  .password-popup h4 {
+    margin-bottom: 5px;
+    color: var(--text-color);
+  }
+  
+  .password-popup ul {
+    padding-left: 20px;
+    color: var(--text-color);
+  }
+  
+  .password-strength {
+    margin-top: 10px;
+    height: 10px;
+    background: #f0f0f3;
+    box-shadow: inset 7px 7px 20px var(--shadow-dark), inset -7px -7px 20px var(--shadow-light);
+    border-radius: 10px;
+  }
+  
+  .strength-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  
+  @media (max-width: 768px) {
+    .password-popup {
+      left: 0;
+      top: 100%;
+      width: 100%;
+    }
+  }

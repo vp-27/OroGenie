@@ -1,5 +1,5 @@
 // Register.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from '../api/axios';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/forms.css';
@@ -12,6 +12,9 @@ function Register() {
   const [lastName, setLastName] = useState('');
   const [message, setMessage] = useState('');
   const [portfolioValue, setPortfolioValue] = useState(100000);
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const popupRef = useRef(null);
   let navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -29,7 +32,7 @@ function Register() {
         navigate('/login');
       }, 1000);
     } catch (error) {
-      setMessage('Error registering user');
+      setMessage('Error registering user, check password requirements');
     }
   };
 
@@ -41,6 +44,36 @@ function Register() {
 
   const handleBlur = () => {
     setIsEditing(false);
+  };
+
+  const handlePasswordFocus = () => {
+    setShowPasswordPopup(true);
+  };
+
+  const handlePasswordBlur = (e) => {
+    if (!popupRef.current.contains(e.relatedTarget)) {
+      setShowPasswordPopup(false);
+    }
+  };
+
+  useEffect(() => {
+    setPasswordStrength(calculatePasswordStrength(password));
+  }, [password]);
+
+  const getPasswordStrengthColor = () => {
+    if (passwordStrength <= 2) return 'red';
+    if (passwordStrength <= 4) return '#f0cb51';
+    return 'green';
+  };
+
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[\W]/.test(password)) strength++;
+    return strength;
   };
 
   return (
@@ -83,16 +116,42 @@ function Register() {
             />
             <label className="form-label">Email</label>
           </div>
-          <div className="input-group">
+          <div className="input-group password-group">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onFocus={handlePasswordFocus}
+              onBlur={handlePasswordBlur}
               required
               placeholder=" "
               className="form-input"
             />
             <label className="form-label">Password</label>
+            {showPasswordPopup && (
+              <div className="password-popup" ref={popupRef}>
+                <h4>Password Requirements:</h4>
+                <ul>
+                  <li>At least 8 characters long</li>
+                  <li>Contains at least 3 of the following:</li>
+                  <ul>
+                    <li>Lowercase letter</li>
+                    <li>Uppercase letter</li>
+                    <li>Digit</li>
+                    <li>Special character</li>
+                  </ul>
+                </ul>
+                <div className="password-strength">
+                  <div 
+                    className="strength-bar" 
+                    style={{
+                      width: `${(passwordStrength / 5) * 100}%`,
+                      backgroundColor: getPasswordStrengthColor()
+                    }}
+                  ></div>
+                </div>
+              </div>
+            )}
           </div>
           <div className="input-group">
             <label className="range-label">Portfolio Value</label>

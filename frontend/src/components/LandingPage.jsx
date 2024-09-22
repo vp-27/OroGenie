@@ -13,7 +13,7 @@ const LandingPage = () => {
                         <ul>
                             <li><Link to="/register" className="nav-link">Sign Up</Link></li>
                             <li><Link to="/login" className="nav-link">Login</Link></li>
-                            <li><Link to="/about" className="nav-link">About</Link></li>
+                            {/* <li><Link to="/about" className="nav-link">About</Link></li> */}
                         </ul>
                     </nav>
                 </header>
@@ -42,21 +42,12 @@ const LandingPage = () => {
                         <p>Watch your paper portfolio grow as you test your trades</p>
                     </div>
                 </section>
-                <section className="advertising parallax parallax-algo">
-                    <h2>Algorithmic Trading</h2>
-                    <p>Leverage AI-powered trading algorithms to maximize your returns.</p>
-                </section>
-                <section className="advertising parallax parallax-ai">
-                    <h2>OroGenie AI Assistant</h2>
-                    <p>Get real-time advice and insights from our AI trading assistant.</p>
-                </section>
-                <section className="advertising parallax parallax-data">
-                    <h2>Real-Time Stock Data</h2>
-                    <p>Stay updated with the latest stock prices, refreshed in real-time.</p>
-                </section>
-                <section className="advertising parallax parallax-community">
-                    <h2>Join the Community</h2>
-                    <p>Connect with other traders, share insights, and grow together.</p>
+                <section className="video">
+                    <div className="video-content">
+                        <iframe width="1022" height="604" src="https://www.youtube.com/embed/BfEcLruyksE" title="Introducing OroGenie - Trading Dashboard Redefined!" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <h2>See OroGenie in Action</h2>
+                        <a href="https://www.youtube.com/watch?v=7dJ4gZuZvQc" className="cta-button">Watch Now</a>
+                    </div>
                 </section>
             </div>
             <footer>

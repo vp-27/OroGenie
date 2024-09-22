@@ -2,8 +2,9 @@ import bcrypt
 from app.models import db, User
 import jwt
 import datetime
+import os
 
-SECRET_KEY = 'your_jwt_secret_key'  # Replace with your actual secret key
+SECRET_KEY = os.getenv('JWT_SECRET_KEY')  # Replace with your actual secret key
 
 def register_user(email, password, first_name, last_name, portfolio_value):
     # Check if user already exists
