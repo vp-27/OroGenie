@@ -27,22 +27,33 @@ jobs:
           python -m venv venv
           source venv/bin/activate
 
-      # Install dependencies from the backend folder
+      # Install Flask backend dependencies
       - name: Install backend dependencies
         run: pip install -r backend/requirements.txt
 
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      
-      - name: Zip artifact for deployment
-        run: zip release.zip ./backend/* -r  # Only zipping backend folder
+      # Install Node.js and build React frontend
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
 
-      - name: Upload artifact for deployment jobs
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      # Zip backend and frontend build for deployment
+      - name: Zip artifact for deployment
+        run: |
+          zip -r release.zip ./backend/* ./frontend/build/*
+
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v3
         with:
           name: python-app
-          path: |
-            release.zip
-            !venv/
+          path: release.zip
+
 
   deploy:
     runs-on: ubuntu-latest
