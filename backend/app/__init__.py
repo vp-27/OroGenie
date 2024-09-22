@@ -1,25 +1,26 @@
-# __init__.py
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from app.models import db  
-# from flask_migrate import Migrate
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize extensions
-# db = SQLAlchemy()
-socketio = SocketIO(cors_allowed_origins="http://localhost:3000")# Allow CORS for WebSockets
+socketio = SocketIO(cors_allowed_origins="http://localhost:3000")  # Allow CORS for WebSockets
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'your_secret_key'  # Secret key for Flask application
-    app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # Secret key for JWTs
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # Load secret key from environment variable
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')  # Load JWT secret key
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')  # Load database URI
 
     # Initialize extensions
     db.init_app(app)
-    # migrate = Migrate(app, db)
     CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
     JWTManager(app)
     socketio.init_app(app, cors_allowed_origins="*", async_mode='eventlet', transports=['polling'])

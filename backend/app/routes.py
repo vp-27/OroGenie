@@ -14,7 +14,7 @@ from sqlalchemy import func
 import logging
 
 
-from datetime import datetime, time, timedelta
+from datetime import datetime, time #, timedelta
 import pytz
 
 from flask_jwt_extended import decode_token
@@ -132,7 +132,7 @@ def get_top_losers():
     
 @bp.route('/fetch-tickers', methods=['GET'])
 def fetch_tickers():
-    file_path = os.path.join('/Users/machanic/Documents/vpStudios/underground_coding/reactive_OroGenie/backend/app/utils/', 'company_tickers.json')
+    file_path = os.path.join('/Users/machanic/Documents/vpStudios/underground_coding/reactive_OroGenie/OroGenie/backend/app/utils/', 'company_tickers.json')
     try:
         with open(file_path, 'r') as file:
             data = json.load(file)
@@ -154,7 +154,7 @@ def get_portfolio_value_history():
     transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.timestamp).all()
 
     portfolio_value = current_user.uninvested_cash + current_user.invested_cash
-    portfolio_history = [{'timestamp': current_user.created_at - timedelta(days=3) + timedelta(minutes=35), 'value': portfolio_value}]
+    portfolio_history = [{'timestamp': current_user.created_at, 'value': portfolio_value}]
 
     for transaction in transactions:
         if transaction.transaction_type == 'buy':
@@ -162,7 +162,7 @@ def get_portfolio_value_history():
         else:  # sell
             portfolio_value += transaction.quantity * float(transaction.price)
         
-        portfolio_history.append({'timestamp': transaction.timestamp - timedelta(days=3) + timedelta(minutes=35), 'value': portfolio_value})
+        portfolio_history.append({'timestamp': transaction.timestamp, 'value': portfolio_value})
 
     return jsonify({'success': True, 'portfolio_history': portfolio_history})
 
@@ -323,7 +323,7 @@ def get_user_transactions():
     transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.timestamp.desc()).limit(20).all()
     
     transactions_data = [{
-        'timestamp': t.timestamp - timedelta(days=3) + timedelta(minutes=35),
+        'timestamp': t.timestamp,
         'transaction_type': t.transaction_type,
         'symbol': t.symbol,
         'quantity': t.quantity,
