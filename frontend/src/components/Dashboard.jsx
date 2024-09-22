@@ -152,7 +152,7 @@ const Dashboard = () => {
     return () => {
       socket.off('stock_update');
     };
-  }, []);
+  }, [currentStock.symbol]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -436,7 +436,7 @@ const Dashboard = () => {
           <div className="portfolioBar-transaction-container">
             <div className="portfolio-bar" onClick={handlePortfolioBarClick}>
               <div className="section-header">
-                Portfolio: ${(userData?.portfolio_value || 0).toFixed(2)}
+                Portfolio: ${(portfolioValue || 0).toFixed(2)}
                 <br />
                 Uninvested Cash: ${(userData?.uninvested_cash || 0).toFixed(2)}
                 <br />

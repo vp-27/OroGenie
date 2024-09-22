@@ -15,6 +15,7 @@ function TradingViewWidget({ symbol, darkMode, chartType }) {
         script.type = "text/javascript";
         script.async = true;
 
+        // Choose script source based on chart type
         if (chartType === 'simple') {
           script.src = "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
           script.textContent = JSON.stringify({
@@ -73,10 +74,10 @@ function TradingViewWidget({ symbol, darkMode, chartType }) {
     return () => {
       clearTimeout(timeoutId); // Clean up the timeout on unmount
       if (container.current) {
-        container.current.innerHTML = '';
+        container.current.innerHTML = ''; // Clear the container
       }
     };
-  }, [symbol, darkMode, chartType]);
+  }, [symbol, darkMode, chartType]); // Ensure all relevant dependencies are included
 
   return (
     <div className="tradingview-widget-container" ref={container} style={{ height: "100%", width: "100%" }}>
