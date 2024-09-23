@@ -4,9 +4,9 @@ function TradingViewWidget({ symbol, darkMode, chartType }) {
   const container = useRef();
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const currentContainer = container.current; // Store ref value
+    const currentContainer = container.current; // Capture the current value of the ref
 
+    const timeoutId = setTimeout(() => {
       if (currentContainer) {
         // Clear any existing content in the container
         currentContainer.innerHTML = '';
@@ -73,8 +73,8 @@ function TradingViewWidget({ symbol, darkMode, chartType }) {
 
     return () => {
       clearTimeout(timeoutId); // Clean up the timeout on unmount
-      if (container.current) {
-        container.current.innerHTML = ''; // Clear the container
+      if (currentContainer) {
+        currentContainer.innerHTML = ''; // Clear the container using the captured ref
       }
     };
   }, [symbol, darkMode, chartType]); // Ensure all relevant dependencies are included
