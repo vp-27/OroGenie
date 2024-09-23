@@ -22,20 +22,15 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Create and start virtual environment
+      - name: Create and install backend dependencies
         run: |
           python -m venv venv
-          source venv/bin/activate
+          ./venv/bin/pip install -r backend/requirements.txt
 
-      # Install Flask backend dependencies
-      - name: Install backend dependencies
-        run: pip install -r backend/requirements.txt
-
-      # Install Node.js and build React frontend
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '20.13.1'
+          node-version: '20'  # or specify your preferred version
 
       - name: Install frontend dependencies
         run: |
@@ -43,7 +38,6 @@ jobs:
           npm install
           npm run build
 
-      # Zip backend and frontend build for deployment
       - name: Zip artifact for deployment
         run: |
           zip -r release.zip ./backend/* ./frontend/build/*
@@ -53,7 +47,6 @@ jobs:
         with:
           name: python-app
           path: release.zip
-
 
   deploy:
     runs-on: ubuntu-latest
@@ -78,4 +71,3 @@ jobs:
           app-name: 'OroGenie'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7DF1A998F78447A69787E11A2A0FC88C }}
-
