@@ -355,7 +355,6 @@ body {
 }
 
 .dashboard .sticky-bar .search-form button {
-  background: rgba(128, 128, 128, .3);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: var(--primary);
