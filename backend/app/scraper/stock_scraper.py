@@ -23,7 +23,11 @@ class StockScraper:
 
     def init_driver(self):
         options = ChromeOptions()
-        options.add_argument('--headless')  # Run headless browser if you don't need a UI
+        options.add_argument('--headless')  # Run headless browser
+        options.add_argument('--no-sandbox')  # Required for running in some containers
+        options.add_argument('--disable-dev-shm-usage')  # Overcome limited resource problems
+        options.binary_location = '/usr/bin/chromium-browser'  # Specify the location of the Chromium binary
+
         # Use webdriver-manager to get the ChromeDriver
         service = ChromeService(ChromeDriverManager().install())
         return webdriver.Chrome(service=service, options=options)
