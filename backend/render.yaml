@@ -1,0 +1,9 @@
+services:
+  - name: backend-service
+    type: web
+    env: python
+    plan: free  # Adjust according to your Render plan
+    buildCommand: |
+      pip install -r requirements.txt  # Install Python dependencies
+      apt-get update && apt-get install -y firefox  # Install Firefox
+    startCommand: python3 run.py
