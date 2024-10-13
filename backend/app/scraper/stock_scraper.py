@@ -27,7 +27,8 @@ class StockScraper:
         options.add_argument('--no-sandbox')  # Required for running in some containers
         options.add_argument('--disable-dev-shm-usage')  # Overcome limited resource problems
         # Use webdriver-manager to get the GeckoDriver
-        service = FirefoxService(GeckoDriverManager().install())
+        driver_path = GeckoDriverManager().install()
+        service = FirefoxService(driver_path)
         return webdriver.Firefox(service=service, options=options)
 
     def get_stock_price(self, ticker):
