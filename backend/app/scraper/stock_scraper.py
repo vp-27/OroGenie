@@ -5,7 +5,6 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from flask_socketio import SocketIO
 import time
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -27,8 +26,8 @@ class StockScraper:
         options.add_argument('--no-sandbox')  # Required for running in some containers
         options.add_argument('--disable-dev-shm-usage')  # Overcome limited resource problems
         
-        # Use webdriver-manager to get the ChromeDriver
-        driver_path = ChromeDriverManager().install()
+        # Use local ChromeDriver
+        driver_path = '/Users/machanic/Downloads/chromedriver-mac-arm64/chromedriver'  # Ensure this points to the binary
         service = ChromeService(driver_path)
         return webdriver.Chrome(service=service, options=options)
 
