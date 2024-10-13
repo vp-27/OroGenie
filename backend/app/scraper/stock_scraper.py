@@ -27,7 +27,7 @@ class StockScraper:
         options.add_argument('--disable-dev-shm-usage')  # Overcome limited resource problems
         
         # Use local ChromeDriver
-        driver_path = '/Users/machanic/Downloads/chromedriver-mac-arm64/chromedriver'  # Ensure this points to the binary
+        driver_path = '/usr/bin/chromedriver'  # Ensure this points to the binary
         service = ChromeService(driver_path)
         return webdriver.Chrome(service=service, options=options)
 

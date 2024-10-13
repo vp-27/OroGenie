@@ -6,5 +6,5 @@ services:
     buildCommand: |
       pip install -r requirements.txt  # Install Python dependencies
       apt-get update
-      apt-get install -y chromium-browser
+      apt-get install -y chromium-browser chromium-chromedriver
     startCommand: python3 run.py
