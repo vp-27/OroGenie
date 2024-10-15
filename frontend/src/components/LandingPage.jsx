@@ -11,6 +11,7 @@ const LandingPage = () => {
                     <h1><Link to="/">OroGenie</Link></h1>
                     <nav>
                         <ul>
+                            <li style={{ marginRight: '50px', fontWeight: 'lighter', color: '#ffffff80' }}>Backend Currently Offline Due to Cost Issues</li>
                             <li><Link to="/register" className="nav-link">Sign Up</Link></li>
                             <li><Link to="/login" className="nav-link">Login</Link></li>
                             <li><Link to="/dashboard" className="nav-link">Dashboard UI Demo</Link></li>
