@@ -21,7 +21,7 @@ services:
         generateValue: true
       - key: CORS_ALLOWED_ORIGINS
         fromService:
-          type: pwa
+          type: web
           name: orogenie-frontend
           property: host
       - key: CHROME_BIN
@@ -30,7 +30,7 @@ services:
         value: /usr/bin/chromedriver
 
   # Frontend Service
-  - type: pwa
+  - type: web
     name: orogenie-frontend
     env: static
     rootDir: frontend
