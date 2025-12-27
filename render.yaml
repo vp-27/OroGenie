@@ -21,7 +21,7 @@ services:
         generateValue: true
       - key: CORS_ALLOWED_ORIGINS
         fromService:
-          type: web
+          type: pwa
           name: orogenie-frontend
           property: host
       - key: CHROME_BIN
@@ -30,10 +30,9 @@ services:
         value: /usr/bin/chromedriver
 
   # Frontend Service
-  - type: web
+  - type: pwa
     name: orogenie-frontend
     env: static
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
