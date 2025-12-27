@@ -13,7 +13,11 @@ import io from 'socket.io-client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import TransactionLog from './TransactionLog';
 
-const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5001/');
+let backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5001/';
+if (backendUrl && !backendUrl.startsWith('http')) {
+  backendUrl = `https://${backendUrl}`;
+}
+const socket = io(backendUrl);
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);

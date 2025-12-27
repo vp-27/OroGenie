@@ -23,7 +23,7 @@ services:
         fromService:
           type: web
           name: orogenie-frontend
-          property: url
+          property: host
       - key: CHROME_BIN
         value: /usr/bin/chromium-browser
       - key: CHROMEDRIVER_PATH
@@ -33,7 +33,6 @@ services:
   - type: web
     name: orogenie-frontend
     env: static
-    region: oregon
     plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
@@ -43,4 +42,4 @@ services:
         fromService:
           type: web
           name: orogenie-backend
-          property: url
+          property: host
