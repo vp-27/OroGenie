@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
-import { Search, Moon, Sun, Edit, LogOut, ChartSpline, ChartCandlestick  } from 'lucide-react';
+import { Search, Moon, Sun, Edit, LogOut, ChartSpline, ChartCandlestick } from 'lucide-react';
 // LineChart
 import TradingViewWidget from './TradingViewWidget';
 import '../styles/dashboard.css';
@@ -13,7 +13,7 @@ import io from 'socket.io-client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import TransactionLog from './TransactionLog';
 
-const socket = io('http://127.0.0.1:5001/');
+const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5001/');
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -177,31 +177,31 @@ const Dashboard = () => {
     };
   }, [handleScroll]);
 
-  
+
 
   const handleSearch = async (e, ticker = null) => {
     setShowPortfolioChart(false);
     setShowChart(true);
     e?.preventDefault(); // Prevent default behavior if event is provided
     const searchTicker = ticker || searchTerm.trim().toUpperCase(); // Use ticker if provided, otherwise use searchTerm
-    
+
     // Only validate if ticker is not passed (i.e., search bar is used)
     if (!ticker) {
       const isValidTicker = filteredTickers.some(t => t.symbol.toUpperCase() === searchTicker);
-  
+
       if (!isValidTicker) {
         // Trigger the invalid effect
         const inputElement = document.querySelector('.sticky-bar input');
         inputElement.classList.add('invalid');
-        
+
         setTimeout(() => {
           inputElement.classList.remove('invalid');
         }, 1000); // Duration of the animation
-        
+
         return; // Exit early if ticker is invalid
       }
     }
-  
+
     try {
       const response = await axios.post('/get-stock-price', { ticker: searchTicker });
       if (response.data.price) {
@@ -213,7 +213,7 @@ const Dashboard = () => {
         };
         setCurrentStock(newStock);
         setShowChart(true);
-  
+
         // Update stock tile prices
         if (topGainers.some(stock => stock.symbol === searchTicker)) {
           setGainersPrices(prev => ({
@@ -267,13 +267,13 @@ const Dashboard = () => {
 
   const handleTrade = async (e) => {
     e.preventDefault();
-  
+
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('No token found');
       return;
     }
-  
+
     const tradeData = {
       symbol: currentStock.symbol,
       shares: parseInt(sharesToTrade),
@@ -281,16 +281,16 @@ const Dashboard = () => {
       orderType: tradeType, // 'market' or 'limit'
       limitPrice: limitPrice ? parseFloat(limitPrice) : null,
     };
-  
+
     try {
       const response = await axios.post('/execute-trade', tradeData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       if (response.data.success) {
         console.log('Trade successful!');
         console.log('Server response:', response.data);
-  
+
         setPortfolioValue(response.data.portfolio_value);
         setUserData(prevData => ({
           ...prevData,
@@ -299,17 +299,17 @@ const Dashboard = () => {
           uninvested_cash: response.data.uninvested_cash
         }));
         setInvestedCash(response.data.invested_cash);
-        
+
         // Update the current stock data
         setCurrentStock(prevStock => ({
           ...prevStock,
           shares: response.data.portfolio.find(stock => stock.symbol === currentStock.symbol)?.quantity || 0
         }));
-  
+
         // Clear the trade form
         setSharesToTrade(0);
         setLimitPrice('');
-  
+
         // Fetch updated portfolio value history
         fetchPortfolioValueHistory();
       } else {
@@ -343,7 +343,7 @@ const Dashboard = () => {
     e.preventDefault();
     setIsAiLoading(true);
     try {
-      const response = await axios.post('/ai-assistant', { input: (aiInput  + ". Maximum 5 sentences. If ever asked to introduce yourself, introduce yourself as OroGenie AI.") }, {
+      const response = await axios.post('/ai-assistant', { input: (aiInput + ". Maximum 5 sentences. If ever asked to introduce yourself, introduce yourself as OroGenie AI.") }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setAiResponse(response.data.response);
@@ -354,8 +354,8 @@ const Dashboard = () => {
       setIsAiLoading(false);
     }
   };
-  
-  
+
+
 
   return (
     <div className={`dashboard ${darkMode ? 'dark' : ''}`}>
@@ -375,8 +375,8 @@ const Dashboard = () => {
       </nav>
 
       <h1 className="greeting">
-          {getGreeting() + userData?.first_name}
-          <span id='cool-dot'>.</span>
+        {getGreeting() + userData?.first_name}
+        <span id='cool-dot'>.</span>
       </h1>
 
       <div style={{ transform: `translateY(${-scrollPosition * 0.5}px)`, transition: 'transform 0.3s ease-out' }}>
@@ -546,9 +546,9 @@ const Dashboard = () => {
         <div className="current-stock">
           <p>{currentStock.symbol}</p>
           {currentStock.price ? (
-              <span>${currentStock.price}</span>
-            ) : (
-              <span>{getGreeting() + userData?.first_name}</span>
+            <span>${currentStock.price}</span>
+          ) : (
+            <span>{getGreeting() + userData?.first_name}</span>
           )}
           {/* <p>${currentStock.price}</p> */}
         </div>
