@@ -50,4 +50,5 @@ virtualenv==20.25.1
 webdriver-manager==4.0.2
 websocket-client==1.8.0
 Werkzeug==3.0.3
-wsproto==1.2.0gunicorn==22.0.0
+wsproto==1.2.0
+gunicorn==22.0.0
