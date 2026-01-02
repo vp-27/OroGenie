@@ -19,10 +19,6 @@ services:
           type: web
           name: orogenie-frontend
           property: host
-      - key: CHROME_BIN
-        value: /usr/bin/chromium
-      - key: CHROMEDRIVER_PATH
-        value: /usr/bin/chromedriver
 
   # Frontend Service
   - type: web
