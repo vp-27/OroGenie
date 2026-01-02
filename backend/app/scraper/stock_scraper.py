@@ -19,22 +19,33 @@ socketio = SocketIO(message_queue='redis://localhost:6379/')  # Assuming Redis i
 class StockScraper:
     def __init__(self, stock_tickers):
         self.stock_tickers = stock_tickers
-        self.driver = self.init_driver()
+        self.driver = None
 
     def init_driver(self):
         options = FirefoxOptions()
         options.add_argument('--headless')
-        # options.add_argument('--no-sandbox') # Firefox often doesn't need this, but good to keep in mind
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument("--disable-gpu")
         
         # In Docker, we installed geckodriver to /usr/local/bin, which is in PATH.
         # So we can just initialize without specifying path, or specify if needed.
-        service = FirefoxService() 
-        
-        return webdriver.Firefox(service=service, options=options)
+        try:
+            service = FirefoxService() 
+            return webdriver.Firefox(service=service, options=options)
+        except Exception as e:
+            logger.error(f"Failed to initialize Firefox driver: {e}")
+            return None
 
     def get_stock_price(self, ticker):
+        if self.driver is None:
+            self.driver = self.init_driver()
+            if self.driver is None:
+                logger.error("Driver not initialized, cannot fetch price.")
+                return None
+
         url = f'https://finance.yahoo.com/quote/{ticker}'
-        self.driver.get(url)
+        try:
+            self.driver.get(url)
         try:
             # Wait for the price element to be present
             WebDriverWait(self.driver, 10).until(
