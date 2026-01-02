@@ -132,7 +132,8 @@ def get_top_losers():
     
 @bp.route('/fetch-tickers', methods=['GET'])
 def fetch_tickers():
-    file_path = os.path.join('/Users/machanic/Documents/vpStudios/underground_coding/reactive_OroGenie/OroGenie/backend/app/utils/', 'company_tickers.json')
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, 'utils', 'company_tickers.json')
     try:
         with open(file_path, 'r') as file:
             data = json.load(file)

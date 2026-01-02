@@ -1,11 +1,11 @@
 import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from flask_socketio import SocketIO
 import time
-from webdriver_manager.firefox import GeckoDriverManager
+import os
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -22,11 +22,23 @@ class StockScraper:
         self.driver = self.init_driver()
 
     def init_driver(self):
-        options = FirefoxOptions()
-        options.add_argument('--headless')  # Run headless browser if you don't need a UI
-        # Use webdriver-manager to get the GeckoDriver
-        service = FirefoxService(GeckoDriverManager().install())
-        return webdriver.Firefox(service=service, options=options)
+        options = ChromeOptions()
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        
+        chrome_bin = os.environ.get('CHROME_BIN')
+        if chrome_bin:
+            options.binary_location = chrome_bin
+
+        chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
+        if chromedriver_path:
+            service = ChromeService(executable_path=chromedriver_path)
+        else:
+            from webdriver_manager.chrome import ChromeDriverManager
+            service = ChromeService(ChromeDriverManager().install())
+
+        return webdriver.Chrome(service=service, options=options)
 
     def get_stock_price(self, ticker):
         url = f'https://finance.yahoo.com/quote/{ticker}'
