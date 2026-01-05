@@ -15,10 +15,7 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: CORS_ALLOWED_ORIGINS
-        fromService:
-          type: web
-          name: orogenie-frontend
-          property: hosturl
+        value: https://orogenie-frontend.onrender.com
 
   # Frontend Service
   - type: web
@@ -29,7 +26,4 @@ services:
     staticPublishPath: ./build
     envVars:
       - key: REACT_APP_BACKEND_URL
-        fromService:
-          type: web
-          name: orogenie-backend
-          property: hosturl
+        value: https://orogenie-backend.onrender.com
