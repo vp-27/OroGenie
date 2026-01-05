@@ -11,14 +11,55 @@ function Register() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const [isLoading, setIsLoading] = useState(false);
   const [portfolioValue, setPortfolioValue] = useState(100000);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const popupRef = useRef(null);
   let navigate = useNavigate();
 
+  const getErrorMessage = (error) => {
+    // Handle network errors
+    if (!error.response) {
+      return 'Unable to connect to server. Please check your internet connection.';
+    }
+
+    const status = error.response.status;
+    const backendMessage = error.response.data?.message;
+
+    switch (status) {
+      case 400:
+        if (backendMessage?.toLowerCase().includes('password')) {
+          return 'Password does not meet requirements. Please check the password guidelines.';
+        }
+        if (backendMessage?.toLowerCase().includes('email')) {
+          return 'Invalid email address. Please enter a valid email.';
+        }
+        return backendMessage || 'Invalid registration details. Please check your information.';
+      case 409:
+        return 'An account with this email already exists. Please login instead.';
+      case 500:
+        return 'Server error. Please try again later.';
+      default:
+        return backendMessage || 'Registration failed. Please try again.';
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
+    setMessage('');
+    setMessageType('');
+
+    // Client-side validation
+    if (passwordStrength < 4) {
+      setMessage('Please create a stronger password that meets all requirements.');
+      setMessageType('error');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await axios.post('/register', {
         email,
@@ -27,12 +68,17 @@ function Register() {
         last_name: lastName,
         portfolio_value: portfolioValue
       });
-      setMessage('User registered successfully');
+      setMessage('Account created successfully! Redirecting to login...');
+      setMessageType('success');
       setTimeout(() => {
         navigate('/login');
-      }, 1000);
+      }, 1500);
     } catch (error) {
-      setMessage('Error registering user, check password requirements');
+      console.error(error);
+      setMessage(getErrorMessage(error));
+      setMessageType('error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,7 +135,8 @@ function Register() {
                 onChange={(e) => setFirstName(e.target.value)}
                 required
                 placeholder=" "
-                className="form-input"
+                className={`form-input ${messageType === 'error' ? 'input-error' : ''}`}
+                disabled={isLoading}
               />
               <label className="form-label">First Name</label>
             </div>
@@ -100,7 +147,8 @@ function Register() {
                 onChange={(e) => setLastName(e.target.value)}
                 required
                 placeholder=" "
-                className="form-input"
+                className={`form-input ${messageType === 'error' ? 'input-error' : ''}`}
+                disabled={isLoading}
               />
               <label className="form-label">Last Name</label>
             </div>
@@ -112,7 +160,8 @@ function Register() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder=" "
-              className="form-input"
+              className={`form-input ${messageType === 'error' ? 'input-error' : ''}`}
+              disabled={isLoading}
             />
             <label className="form-label">Email</label>
           </div>
@@ -125,7 +174,8 @@ function Register() {
               onBlur={handlePasswordBlur}
               required
               placeholder=" "
-              className="form-input"
+              className={`form-input ${messageType === 'error' ? 'input-error' : ''}`}
+              disabled={isLoading}
             />
             <label className="form-label">Password</label>
             {showPasswordPopup && (
@@ -142,8 +192,8 @@ function Register() {
                   </ul>
                 </ul>
                 <div className="password-strength">
-                  <div 
-                    className="strength-bar" 
+                  <div
+                    className="strength-bar"
                     style={{
                       width: `${(passwordStrength / 5) * 100}%`,
                       backgroundColor: getPasswordStrengthColor()
@@ -178,11 +228,28 @@ function Register() {
               </>
             )}
           </div>
-          <button type="submit" className="form-button">Register</button>
+          <button
+            type="submit"
+            className={`form-button ${isLoading ? 'button-loading' : ''}`}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="button-content">
+                <span className="spinner"></span>
+                Creating account...
+              </span>
+            ) : (
+              'Register'
+            )}
+          </button>
+          {message && (
+            <p className={`form-message ${messageType === 'success' ? 'message-success' : 'message-error'}`}>
+              {message}
+            </p>
+          )}
           <p className="redirect-link">Already have an account?</p>
           <Link to="/login">Login Here!</Link>
         </form>
-        {message && <p className="form-message">{message}</p>}
       </div>
     </div>
   );
