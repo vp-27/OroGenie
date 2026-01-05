@@ -23,7 +23,7 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [currentStock, setCurrentStock] = useState('');
+  const [currentStock, setCurrentStock] = useState({ symbol: '', name: '', price: '', shares: 0 });
   const [searchTerm, setSearchTerm] = useState('');
   const [topGainers, setTopGainers] = useState([]);
   const [topLosers, setTopLosers] = useState([]);
@@ -34,6 +34,8 @@ const Dashboard = () => {
   const [code, setCode] = useState('');
   const [showChart, setShowChart] = useState(true);
   const [chartType, setChartType] = useState('simple');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState('');
 
   // Paper Trading States
   const [tradeType, setTradeType] = useState('market'); // 'market' or 'limit'
@@ -182,29 +184,31 @@ const Dashboard = () => {
   }, [handleScroll]);
 
 
-
   const handleSearch = async (e, ticker = null) => {
     setShowPortfolioChart(false);
     setShowChart(true);
-    e?.preventDefault(); // Prevent default behavior if event is provided
-    const searchTicker = ticker || searchTerm.trim().toUpperCase(); // Use ticker if provided, otherwise use searchTerm
+    e?.preventDefault();
+    const searchTicker = ticker || searchTerm.trim().toUpperCase();
 
     // Only validate if ticker is not passed (i.e., search bar is used)
     if (!ticker) {
       const isValidTicker = filteredTickers.some(t => t.symbol.toUpperCase() === searchTicker);
 
-      if (!isValidTicker) {
+      if (!isValidTicker && searchTicker.length > 0) {
         // Trigger the invalid effect
         const inputElement = document.querySelector('.sticky-bar input');
-        inputElement.classList.add('invalid');
-
-        setTimeout(() => {
-          inputElement.classList.remove('invalid');
-        }, 1000); // Duration of the animation
-
-        return; // Exit early if ticker is invalid
+        if (inputElement) {
+          inputElement.classList.add('invalid');
+          setTimeout(() => {
+            inputElement.classList.remove('invalid');
+          }, 1000);
+        }
+        return;
       }
     }
+
+    setIsSearching(true);
+    setSearchError('');
 
     try {
       const response = await axios.post('/get-stock-price', { ticker: searchTicker });
@@ -232,10 +236,14 @@ const Dashboard = () => {
           }));
         }
       } else {
+        setSearchError('Stock price not found');
         console.error('Stock price not found');
       }
     } catch (error) {
+      setSearchError('Could not fetch stock price');
       console.error('Error fetching stock price:', error);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -429,10 +437,23 @@ const Dashboard = () => {
             <div className="info-container">
               <div className="section-header">Stock Information</div>
               <div className="stock-details">
-                <p>Symbol: {currentStock?.symbol}</p>
-                <p>Price: ${currentStock?.price}</p>
-                {/*<p>Shares Owned: {currentStock?.shares}</p>*/}
-                {/* <p>Total Value: ${(currentStock?.shares * parseFloat(currentStock?.price || 0)).toFixed(2)}</p> */}
+                {isSearching ? (
+                  <div className="stock-loading">
+                    <div className="chart-loading-spinner"></div>
+                    <span>Loading...</span>
+                  </div>
+                ) : searchError ? (
+                  <div className="stock-error">
+                    <span>{searchError}</span>
+                  </div>
+                ) : currentStock?.symbol ? (
+                  <>
+                    <p><strong>Symbol:</strong> {currentStock.symbol}</p>
+                    <p><strong>Price:</strong> ${currentStock.price}</p>
+                  </>
+                ) : (
+                  <p className="stock-placeholder">Search for a stock to see details</p>
+                )}
               </div>
             </div>
           </div>
@@ -530,7 +551,10 @@ const Dashboard = () => {
           </div>
 
           <div className="tile algo-trading" id='algo-trading'>
-            <div className="section-header">Algorithmic Trading</div>
+            <div className="section-header">
+              Algorithmic Trading
+              <span className="coming-soon-badge">Coming Soon</span>
+            </div>
             <CodeMirror
               value={code}
               height="150px"
@@ -539,7 +563,7 @@ const Dashboard = () => {
               onChange={(value) => setCode(value)}
               placeholder="Write your Python code here..."
             />
-            <button>
+            <button disabled>
               Run Code
             </button>
           </div>

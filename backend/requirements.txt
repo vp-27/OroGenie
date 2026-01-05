@@ -52,3 +52,4 @@ websocket-client==1.8.0
 Werkzeug==3.0.3
 wsproto==1.2.0
 gunicorn==22.0.0
+yfinance>=0.2.40

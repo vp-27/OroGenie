@@ -52,7 +52,8 @@ body {
   flex-wrap: wrap;
 }
 
-.dashboard .navBar a, .dashboard .navBar button {
+.dashboard .navBar a,
+.dashboard .navBar button {
   text-decoration: none;
   background: none;
   border: none;
@@ -126,7 +127,8 @@ body {
 .dashboard .portfolioBar-transaction-container {
   display: flex;
   gap: 20px;
-  height: 400px; /* Adjust this value as needed */
+  height: 400px;
+  /* Adjust this value as needed */
 }
 
 .dashboard .portfolio-bar {
@@ -157,7 +159,8 @@ body {
   position: sticky;
   top: 0;
   background-color: var(--background);
-  z-index: 2; /* Ensure it's above the blur effect */
+  z-index: 2;
+  /* Ensure it's above the blur effect */
   box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
 }
 
@@ -166,7 +169,7 @@ body {
   padding: 8px;
   text-align: left;
   border-bottom: 1px solid var(--shadow-dark);
-  
+
 }
 
 .dashboard .stock-tiles-wrapper {
@@ -174,7 +177,8 @@ body {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
-  max-height: 300px; /* Adjust this value as needed */
+  max-height: 300px;
+  /* Adjust this value as needed */
   overflow-x: auto;
 }
 
@@ -242,8 +246,10 @@ body {
 .dashboard .dashboard-grid {
   margin-top: 20px;
   display: flex;
-  flex-direction: column; /* Stack rows vertically */
-  gap: 1rem; /* Space between rows */
+  flex-direction: column;
+  /* Stack rows vertically */
+  gap: 1rem;
+  /* Space between rows */
 }
 
 .tile {
@@ -254,13 +260,17 @@ body {
 .top-gainers .stock-tiles-container,
 .top-losers .stock-tiles-container {
   display: flex;
-  overflow-x: auto; /* Allow horizontal scrolling if needed */
-  gap: 1rem; /* Space between tiles */
-  padding: 0.5rem 0; /* Vertical padding */
+  overflow-x: auto;
+  /* Allow horizontal scrolling if needed */
+  gap: 1rem;
+  /* Space between tiles */
+  padding: 0.5rem 0;
+  /* Vertical padding */
 }
 
 .stock-tile {
-  flex: 0 0 auto; /* Prevent tiles from shrinking */
+  flex: 0 0 auto;
+  /* Prevent tiles from shrinking */
   /* Add styles for individual tiles */
 }
 
@@ -434,7 +444,8 @@ body {
   max-width: 300px;
   max-height: 200px;
   overflow-y: auto;
-  background: var(--background); /* Ensure this has transparency */
+  background: var(--background);
+  /* Ensure this has transparency */
   border-radius: 10px;
   box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
   z-index: 20;
@@ -463,11 +474,13 @@ body {
   }
 
   .dashboard .sticky-bar .search-form input {
-    width: calc(100% - 50px); /* Adjust width for better fit */
+    width: calc(100% - 50px);
+    /* Adjust width for better fit */
   }
 }
 
 @media (max-width: 768px) {
+
   .dashboard .chart-info-container,
   .dashboard .portfolioBar-transaction-container {
     flex-direction: column;
@@ -478,7 +491,7 @@ body {
     align-items: stretch;
   }
 
-  .dashboard .sticky-bar > * {
+  .dashboard .sticky-bar>* {
     margin-bottom: 10px;
   }
 
@@ -493,7 +506,8 @@ body {
 
   .dashboard .autocomplete-suggestions {
     max-width: 90%;
-    bottom: 60px; /* Adjust based on available space */
+    bottom: 60px;
+    /* Adjust based on available space */
   }
 }
 
@@ -504,11 +518,13 @@ body {
 
   .dashboard .sticky-bar .search-form input {
     height: 35px;
-    width: calc(100% - 50px); /* Adjust for very small screens */
+    width: calc(100% - 50px);
+    /* Adjust for very small screens */
   }
 
   .dashboard .sticky-bar .trade-options input {
-    width: 80px; /* Reduce input width for smaller screens */
+    width: 80px;
+    /* Reduce input width for smaller screens */
   }
 
   .dashboard .sticky-bar .buy-sell-buttons .buy,
@@ -537,7 +553,7 @@ body {
 }
 
 .dashboard .ai-assistant form input:focus {
-  
+
   background-color: var(--background);
   outline: none;
 }
@@ -549,4 +565,89 @@ body {
   background: var(--primary);
   color: var(--background);
   cursor: pointer;
+}
+
+/* Loading Spinner */
+.chart-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--shadow-dark);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Stock Loading State */
+.dashboard .stock-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+/* Stock Error State */
+.dashboard .stock-error {
+  color: var(--negative);
+  padding: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Stock Placeholder */
+.dashboard .stock-placeholder {
+  color: var(--text-color);
+  opacity: 0.5;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Coming Soon Badge */
+.coming-soon-badge {
+  background: linear-gradient(135deg, var(--primary), #ff8c00);
+  color: var(--background);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Disabled button */
+.dashboard #algo-trading button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Invalid input animation */
+.dashboard .sticky-bar input.invalid {
+  animation: shake 0.3s ease;
+  border-color: var(--negative);
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
 }

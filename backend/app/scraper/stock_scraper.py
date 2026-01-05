@@ -1,13 +1,7 @@
 import logging
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
+import yfinance as yf
 from flask_socketio import SocketIO
 import time
-import os
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -17,48 +11,70 @@ logger = logging.getLogger(__name__)
 socketio = SocketIO(message_queue='redis://localhost:6379/')  # Assuming Redis is used as the message queue
 
 class StockScraper:
-    def __init__(self, stock_tickers):
-        self.stock_tickers = stock_tickers
-        self.driver = None
-
-    def init_driver(self):
-        options = FirefoxOptions()
-        options.add_argument('--headless')
-        options.add_argument("--window-size=1920,1080")
-        options.add_argument("--disable-gpu")
-        
-        # In Docker, we installed geckodriver to /usr/local/bin, which is in PATH.
-        # So we can just initialize without specifying path, or specify if needed.
-        try:
-            service = FirefoxService() 
-            return webdriver.Firefox(service=service, options=options)
-        except Exception as e:
-            logger.error(f"Failed to initialize Firefox driver: {e}")
-            return None
+    def __init__(self, stock_tickers=None):
+        self.stock_tickers = stock_tickers or []
+        self._cache = {}
+        self._cache_ttl = 60  # Cache prices for 60 seconds
 
     def get_stock_price(self, ticker):
-        if self.driver is None:
-            self.driver = self.init_driver()
-            if self.driver is None:
-                logger.error("Driver not initialized, cannot fetch price.")
-                return None
-
-        url = f'https://finance.yahoo.com/quote/{ticker}'
+        """Get the current stock price for a given ticker using yfinance."""
+        ticker = ticker.upper()
+        
+        # Check cache first
+        cache_entry = self._cache.get(ticker)
+        if cache_entry and (time.time() - cache_entry['timestamp']) < self._cache_ttl:
+            logger.info(f"Returning cached price for {ticker}: {cache_entry['price']}")
+            return cache_entry['price']
+        
         try:
-            self.driver.get(url)
-            # Wait for the price element to be present
-            WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, f'[data-symbol="{ticker}"][data-field="regularMarketPrice"]'))
-            )
-            price_element = self.driver.find_element(By.CSS_SELECTOR, f'[data-symbol="{ticker}"][data-field="regularMarketPrice"]')
-            price = price_element.text
-            logger.info(f"Fetched price for {ticker}: {price}")
-            return price
+            stock = yf.Ticker(ticker)
+            
+            # Try multiple methods to get current price
+            price = None
+            
+            # Method 1: Try fast_info (faster, less API calls)
+            try:
+                fast_info = stock.fast_info
+                price = fast_info.get('lastPrice') or fast_info.get('last_price')
+            except Exception:
+                pass
+            
+            # Method 2: Try info dict if fast_info failed
+            if price is None:
+                try:
+                    info = stock.info
+                    price = info.get('regularMarketPrice') or info.get('currentPrice')
+                except Exception:
+                    pass
+            
+            # Method 3: Get latest history if info failed
+            if price is None:
+                try:
+                    hist = stock.history(period='1d')
+                    if not hist.empty:
+                        price = hist['Close'].iloc[-1]
+                except Exception:
+                    pass
+            
+            if price is not None:
+                price_str = f"{float(price):.2f}"
+                # Update cache
+                self._cache[ticker] = {
+                    'price': price_str,
+                    'timestamp': time.time()
+                }
+                logger.info(f"Fetched price for {ticker}: {price_str}")
+                return price_str
+            else:
+                logger.warning(f"Could not fetch price for {ticker}")
+                return None
+                
         except Exception as e:
             logger.error(f"Error fetching price for {ticker}: {e}")
             return None
 
     def run(self):
+        """Background task to continuously fetch and broadcast stock prices."""
         logger.info("Starting scraper...")
         while True:
             for ticker in self.stock_tickers:
@@ -69,22 +85,20 @@ class StockScraper:
             time.sleep(30)  # Wait before checking prices again
 
     def broadcast_price_update(self, ticker, price):
-        # Emit the stock price update to all connected WebSocket clients
-        print(f'Broadcasting new price for {ticker}: {price}')
+        """Emit the stock price update to all connected WebSocket clients."""
+        logger.info(f'Broadcasting new price for {ticker}: {price}')
         socketio.emit('stock_update', {'ticker': ticker, 'price': price}, namespace='/')
 
     def close(self):
+        """Cleanup method (kept for compatibility)."""
         logger.info("Closing scraper...")
-        self.driver.quit()
+
 
 if __name__ == '__main__':
-    # Define the list of stock tickers you want to scrape
+    # Test the scraper
     stock_tickers = ['AAPL', 'GOOGL', 'AMZN']
-
-    # Create an instance of the scraper
     scraper = StockScraper(stock_tickers)
-
-    try:
-        scraper.run()
-    except KeyboardInterrupt:
-        scraper.close()
+    
+    for ticker in stock_tickers:
+        price = scraper.get_stock_price(ticker)
+        print(f"{ticker}: ${price}")
