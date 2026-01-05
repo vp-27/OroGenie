@@ -60,25 +60,19 @@ def login():
         return jsonify(message=str(e)), 401
 
 @bp.route('/user-data', methods=['GET'])
+@jwt_required()
 def user_data():
-    # Handle GET request
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify(message="Token is missing"), 401
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify(message="User not found"), 404
 
-    try:
-        token = token.replace("Bearer ", "")
-        decoded = jwt.decode(token, 'your_jwt_secret_key', algorithms=['HS256'])
-        email = decoded['sub']
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            return jsonify(message="User not found"), 404
-
-        return jsonify(email=user.email, first_name=user.first_name, last_name=user.last_name, portfolio_value=user.portfolio_value), 200
-    except jwt.ExpiredSignatureError:
-        return jsonify(message="Token has expired"), 401
-    except jwt.InvalidTokenError:
-        return jsonify(message="Invalid token"), 401
+    return jsonify(
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        portfolio_value=user.portfolio_value
+    ), 200
 
 @bp.route('/get-stock-price', methods=['POST'])
 def get_stock_price_route():
