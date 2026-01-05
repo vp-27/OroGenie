@@ -46,7 +46,6 @@ class StockScraper:
         url = f'https://finance.yahoo.com/quote/{ticker}'
         try:
             self.driver.get(url)
-        try:
             # Wait for the price element to be present
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, f'[data-symbol="{ticker}"][data-field="regularMarketPrice"]'))
