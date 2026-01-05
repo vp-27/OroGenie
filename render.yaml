@@ -18,7 +18,7 @@ services:
         fromService:
           type: web
           name: orogenie-frontend
-          property: host
+          property: hosturl
 
   # Frontend Service
   - type: web
@@ -32,4 +32,4 @@ services:
         fromService:
           type: web
           name: orogenie-backend
-          property: host
+          property: hosturl
