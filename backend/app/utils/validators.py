@@ -1,16 +1,16 @@
 import re
 
+
 def is_valid_email(email):
-    # Regular expression to validate email format
-    regex = r'^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-    return re.match(regex, email)
+    if not isinstance(email, str):
+        return False
+    return re.fullmatch(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", email) is not None
+
 
 def is_valid_password(password):
-    # Check if password meets the requirements:
-    # - Length more that 8 characters
-    # - Contains at least 3 of the following: lowercase letter, uppercase letter, digit, special character
-    if len(password) < 8:
+    if not isinstance(password, str) or len(password) < 8:
         return False
-    if sum(bool(re.search(p, password)) for p in [r'[a-z]', r'[A-Z]', r'[0-9]', r'[\W]']) < 3:
-        return False
-    return True
+    # Require at least three character classes.
+    return sum(bool(re.search(pattern, password)) for pattern in (
+        r"[a-z]", r"[A-Z]", r"[0-9]", r"[^A-Za-z0-9]"
+    )) >= 3

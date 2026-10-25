@@ -12,6 +12,11 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    # Do not start with missing signing keys, including in local development.
+    for key in ('SECRET_KEY', 'JWT_SECRET_KEY'):
+        if not app.config.get(key):
+            raise RuntimeError(f'{key} must be configured as an environment variable')
+
     # Initialize extensions
     db.init_app(app)
     

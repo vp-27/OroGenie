@@ -8,6 +8,8 @@ from app.scraper.stock_scraper import StockScraper
 import requests
 import json
 import os
+import re
+import math
 
 from sqlalchemy import func
 
@@ -26,38 +28,58 @@ stock_scraper = StockScraper(stock_tickers=['MSFT', 'TSLA', 'NVDA'])
 
 @bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(message="A JSON object is required"), 400
+
     email = data.get('email')
     password = data.get('password')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     portfolio_value = data.get('portfolio_value')
 
+    try:
+        portfolio_value = float(portfolio_value)
+    except (TypeError, ValueError):
+        return jsonify(message="Starting paper balance must be a number"), 400
+    if not math.isfinite(portfolio_value) or portfolio_value < 0:
+        return jsonify(message="Starting paper balance must be nonnegative"), 400
+
     if not is_valid_email(email):
         return jsonify(message="Invalid email address"), 400
     if not is_valid_password(password):
         return jsonify(message="Password does not meet requirements"), 400
+    if not all(isinstance(name, str) and name.strip() for name in (first_name, last_name)):
+        return jsonify(message="First and last names are required"), 400
 
     try:
         user = register_user(email, password, first_name, last_name, portfolio_value)
         return jsonify(message="User registered successfully", user=user), 201
-    except Exception as e:
-        return jsonify(message=str(e)), 400
+    except ValueError:
+        return jsonify(message="User already exists"), 409
+    except Exception:
+        return jsonify(message="Registration failed"), 500
 
 @bp.route('/login', methods=['POST'])
 def login():
-    data = request.json
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(message="A JSON object is required"), 400
     email = data.get('email')
     password = data.get('password')
 
     if not is_valid_email(email):
         return jsonify(message="Invalid email address"), 400
+    if not isinstance(password, str) or not password:
+        return jsonify(message="A password is required"), 400
 
     try:
         token = login_user(email, password)
         return jsonify(message="Login successful", token=token), 200
-    except Exception as e:
-        return jsonify(message=str(e)), 401
+    except ValueError:
+        return jsonify(message="Invalid credentials"), 401
+    except Exception:
+        return jsonify(message="Login failed"), 500
 
 @bp.route('/user-data', methods=['GET'])
 @jwt_required()
@@ -76,10 +98,11 @@ def user_data():
 
 @bp.route('/get-stock-price', methods=['POST'])
 def get_stock_price_route():
-    ticker = request.json.get('ticker')
-    ticker = ticker.upper()
-    if not ticker:
-        return jsonify({"error": "No ticker provided"}), 400
+    data = request.get_json(silent=True) or {}
+    ticker = data.get('ticker') if isinstance(data, dict) else None
+    if not isinstance(ticker, str) or not ticker.strip():
+        return jsonify({"error": "A ticker is required"}), 400
+    ticker = ticker.strip().upper()
 
     price = stock_scraper.get_stock_price(ticker)
     if price:
@@ -193,18 +216,51 @@ def execute_trade():
     if current_user is None:
         return jsonify({'success': False, 'message': 'User not found'}), 404
 
-    data = request.get_json()
-    symbol = data['symbol'].upper()
-    shares = int(data['shares'])
-    trade_type = data['tradeType']  # 'buy' or 'sell'
-    order_type = data['orderType']  # 'market' or 'limit'
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'success': False, 'message': 'A JSON object is required'}), 400
+
+    symbol = data.get('symbol')
+    shares_raw = data.get('shares')
+    trade_type = data.get('tradeType')
+    order_type = data.get('orderType')
     limit_price = data.get('limitPrice')
+
+    if not isinstance(symbol, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.-]{0,14}', symbol):
+        return jsonify({'success': False, 'message': 'Invalid stock symbol'}), 400
+    symbol = symbol.upper()
+
+    # Reject negative, zero, fractional, and boolean quantities before modifying balances.
+    if isinstance(shares_raw, bool) or not re.fullmatch(r'[0-9]+', str(shares_raw)):
+        return jsonify({'success': False, 'message': 'Shares must be a positive whole number'}), 400
+    if len(str(shares_raw)) > 10:
+        return jsonify({'success': False, 'message': 'Share quantity is too large'}), 400
+    shares = int(shares_raw)
+    if shares <= 0:
+        return jsonify({'success': False, 'message': 'Shares must be greater than zero'}), 400
+
+    if trade_type not in ('buy', 'sell'):
+        return jsonify({'success': False, 'message': 'Invalid trade type'}), 400
+    if order_type not in ('market', 'limit'):
+        return jsonify({'success': False, 'message': 'Invalid order type'}), 400
+    if order_type == 'limit':
+        try:
+            limit_price = float(limit_price)
+        except (TypeError, ValueError):
+            return jsonify({'success': False, 'message': 'A valid limit price is required'}), 400
+        if not math.isfinite(limit_price) or limit_price <= 0:
+            return jsonify({'success': False, 'message': 'Limit price must be positive'}), 400
 
     current_price = stock_scraper.get_stock_price(symbol)
     if current_price is None:
         return jsonify({'success': False, 'message': 'Failed to fetch current stock price'}), 500
 
-    current_price = float(current_price)
+    try:
+        current_price = float(current_price)
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Invalid market price'}), 502
+    if not math.isfinite(current_price) or current_price <= 0:
+        return jsonify({'success': False, 'message': 'Invalid market price'}), 502
 
     if order_type == 'limit' and limit_price is not None:
         limit_price = float(limit_price)
@@ -330,7 +386,7 @@ def get_user_transactions():
         'transactions': transactions_data
     })
 
-OPENROUTER_API_KEY = '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'
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
 # YOUR_SITE_URL = os.environ.get('YOUR_SITE_URL')
 # YOUR_APP_NAME = os.environ.get('YOUR_APP_NAME')
 
@@ -342,6 +398,9 @@ def ai_assistant():
 
     if not user_input:
         return jsonify({'error': 'No input provided'}), 400
+
+    if not OPENROUTER_API_KEY:
+        return jsonify({'error': 'AI assistant is not configured'}), 503
 
     try:
         response = requests.post(
