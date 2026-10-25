@@ -206,7 +206,7 @@ def execute_trade():
     order_type = data.get('orderType')
     limit_price = data.get('limitPrice')
 
-    if not isinstance(symbol, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.\\-]{0,14}', symbol):
+    if not isinstance(symbol, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.-]{0,14}', symbol):
         return jsonify({'success': False, 'message': 'Invalid stock symbol'}), 400
     symbol = symbol.upper()
 
