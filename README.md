@@ -1,90 +1,81 @@
-# OroGenie - A New Approach to Trading Dashboards
-Revamped Trading Dashboard | Real Time Stock Data | Paper Trader | Python Algorithmic Trader Trader | 
+# OroGenie
 
-OroGenie is a full-featured web application designed to enhance the user experience of traditional brokerage platforms. Built with a focus on clean, intuitive UI/UX and backed by a powerful full-stack framework, OroGenie provides users with a seamless interface for tracking stock performance, simulating trades, and more.
+A full-stack paper-trading and portfolio dashboard built with **React, Flask, and SQLAlchemy**.
 
-## Key Features
+I built OroGenie to experiment with a simpler brokerage-style interface: track simulated holdings, review price movements, and explore a portfolio without placing real trades.
 
-- **UI/UX Design:** OroGenie employs neumorphism with accessibility in mind, providing a sleek, clean, and intuitive user interface. The design also visualizes stock performance, making it easier to interpret at a glance. OroGenie features a one-page dashboard to prevent users from feeling overwhelmed by too much navigation.
-  
-- **Full-Stack Development:** The application is built using Python (Flask), React, and SQLAlchemy to create a robust, scalable backend and a responsive frontend.
-  
-- **Secure Authentication:** JWT (JSON Web Tokens) has been implemented to safeguard user data. However, please note the security advisory below.
-  
-- **Paper Trading:** OroGenie includes a paper trading system to simulate real market conditions, allowing users to test strategies without risking real money.
-  
-- **Real-Time Data Integration:** OroGenie uses Selenium web scraping to fetch live stock data from Yahoo Finance, ensuring real-time accuracy for stock prices.
-  
-- **Dynamic Portfolio Visualization:** The dashboard offers Recharts-powered data visualizations, allowing users to track stock performance over time.
-  
-- **AI Assistant:** A built-in AI assistant helps automate various tasks, improving the overall user experience.
+## What it does
 
-## Security Notice
+- **Paper portfolio:** Create an account, track simulated holdings and cash balances, and record buy/sell transactions.
+- **Market data:** Look up stock prices and view gainers/losers using external data sources and scraping.
+- **Portfolio views:** Inspect transaction history and portfolio charts.
+- **AI assistant:** A simple optional OpenRouter-powered chat endpoint.
+- **Backend:** Flask REST routes, JWT authentication, SQLAlchemy models, and Socket.IO support.
 
-While the application is currently secured with JWT-based authentication, **the keys in this repository are not encrypted or hidden, even though user data and passwords are encrypted the decryption keys are yet to be hidden**. This makes the app **insecure for personal use** with real financial or sensitive data. **Do not use OroGenie with your personal or financial information.** Feel free to explore the features and test the app with sample data.
+This is a **personal project and paper-trading prototype**, not a brokerage or production financial service. Market feeds and third-party endpoints may change or stop working.
 
-We recommend using a dummy account for testing purposes. **If you plan to deploy the app in a production environment, please implement proper key management and secure any sensitive data before doing so.**
+## Stack
 
-## Installation
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React, Recharts, Axios, Socket.IO client |
+| Backend | Python, Flask, Flask-SQLAlchemy, Flask-JWT-Extended, Flask-SocketIO |
+| Storage | SQLAlchemy; SQLite by default, configurable with `SQLALCHEMY_DATABASE_URI` |
+| Data | Yahoo Finance scraping/yfinance and other third-party market endpoints |
+| Deployment | Render static frontend and Docker-based Flask backend |
 
-To get started with OroGenie, follow these steps:
+The deployment configuration for both services lives in [`render.yaml`](render.yaml).
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/vp-27/OroGenie
-   cd orogenie
-   ```
+## Local development
 
-2. **Backend setup**:
-   - Navigate to the backend directory:
-     ```bash
-     cd backend
-     ```
-   - Install the backend dependencies:
-     ```bash
-     pip install -r requirements.txt
-     ```
-   - Set up your environment variables for Flask, JWT, and database configurations:
-     ```bash
-     export FLASK_APP=run.py
-     export SECRET_KEY='your-secret-key'
-     export JWT_SECRET_KEY='your-jwt-secret-key'
-     ```
-   - Run the Flask server:
-     ```bash
-     python3 run.py
-     ```
+### Backend
 
-3. **Frontend setup**:
-   - Navigate to the frontend directory:
-     ```bash
-     cd ../frontend
-     ```
-   - Install the frontend dependencies:
-     ```bash
-     npm install
-     ```
-   - Run the React frontend:
-     ```bash
-     npm start
-     ```
+Use Python 3.12. From the repository root:
 
-4. **Access the app**:
-   - Visit `http://localhost:3000` for the frontend.
-   - The backend runs on `http://127.0.0.1:5000`.
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
+Copy [`.env.example`](backend/.env.example) to `backend/.env`, then provide **your own randomly generated** `SECRET_KEY` and `JWT_SECRET_KEY`. For example, generate each one with:
 
-## What's Next?
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
 
-I'm currently working on:
-- A Python-based algorithmic trader to automate financial decisions.
-- Automating tax style sheet creation for even paper trading transactions.
-- Adding more customization options to enhance the user experience.
+Optionally configure `OPENROUTER_API_KEY` if you want to use the AI assistant. Otherwise, that endpoint returns HTTP 503.
 
-## Contributing
+```bash
+python run.py
+```
 
-Contributions to OroGenie are welcome! Feel free to open a pull request or submit an issue to help improve the project.
+The development backend listens on **http://localhost:5001**.
 
----
+### Frontend
 
-Let me know if you’d like any adjustments!
+In a second terminal:
+
+```bash
+cd frontend
+npm ci
+npm start
+```
+
+The React app opens at **http://localhost:3000**. The development API URL defaults to `http://127.0.0.1:5001/`. Set `REACT_APP_BACKEND_URL` for a different backend address.
+
+## Render deployment
+
+The checked-in Blueprint defines **two Render services**: a Docker-based Flask backend and a static React frontend. Render generates `SECRET_KEY` and `JWT_SECRET_KEY` for the backend. If the AI assistant is needed, configure `OPENROUTER_API_KEY` directly in the backend service's **Environment** settings; don't commit its value.
+
+The default SQLite database is **not a persistent managed database**. Data can be lost on a free/ephemeral deployment or during redeployment. A persistent database and additional operational work are required for reliable accounts.
+
+## Security and limitations
+
+- Do **not** enter real financial credentials or use this app as a brokerage.
+- Passwords are hashed with bcrypt and account-specific routes use JWT authentication. These controls alone do not make the prototype production-ready.
+- An older commit contained an OpenRouter credential, and the repository history included a local SQLite user database. Treat any affected credentials as exposed and review the database before using real personal information.
+- JWTs are currently stored in browser `localStorage`. Stronger session handling, input validation, security testing, dependency upgrades, and persistent database deployment would be needed before real use.
+
+This repository shows the architecture and experimentation behind OroGenie; it is not a hardened financial application.
