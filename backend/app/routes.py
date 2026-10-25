@@ -49,12 +49,16 @@ def register():
         return jsonify(message="Invalid email address"), 400
     if not is_valid_password(password):
         return jsonify(message="Password does not meet requirements"), 400
+    if not all(isinstance(name, str) and name.strip() for name in (first_name, last_name)):
+        return jsonify(message="First and last names are required"), 400
 
     try:
         user = register_user(email, password, first_name, last_name, portfolio_value)
         return jsonify(message="User registered successfully", user=user), 201
-    except Exception as e:
-        return jsonify(message=str(e)), 400
+    except ValueError:
+        return jsonify(message="User already exists"), 409
+    except Exception:
+        return jsonify(message="Registration failed"), 500
 
 @bp.route('/login', methods=['POST'])
 def login():
@@ -66,12 +70,16 @@ def login():
 
     if not is_valid_email(email):
         return jsonify(message="Invalid email address"), 400
+    if not isinstance(password, str) or not password:
+        return jsonify(message="A password is required"), 400
 
     try:
         token = login_user(email, password)
         return jsonify(message="Login successful", token=token), 200
-    except Exception as e:
-        return jsonify(message=str(e)), 401
+    except ValueError:
+        return jsonify(message="Invalid credentials"), 401
+    except Exception:
+        return jsonify(message="Login failed"), 500
 
 @bp.route('/user-data', methods=['GET'])
 @jwt_required()
