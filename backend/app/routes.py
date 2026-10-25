@@ -330,7 +330,7 @@ def get_user_transactions():
         'transactions': transactions_data
     })
 
-OPENROUTER_API_KEY = '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'
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
 # YOUR_SITE_URL = os.environ.get('YOUR_SITE_URL')
 # YOUR_APP_NAME = os.environ.get('YOUR_APP_NAME')
 
@@ -342,6 +342,9 @@ def ai_assistant():
 
     if not user_input:
         return jsonify({'error': 'No input provided'}), 400
+
+    if not OPENROUTER_API_KEY:
+        return jsonify({'error': 'AI assistant is not configured'}), 503
 
     try:
         response = requests.post(
