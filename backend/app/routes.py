@@ -8,6 +8,8 @@ from app.scraper.stock_scraper import StockScraper
 import requests
 import json
 import os
+import re
+import math
 
 from sqlalchemy import func
 
@@ -76,10 +78,11 @@ def user_data():
 
 @bp.route('/get-stock-price', methods=['POST'])
 def get_stock_price_route():
-    ticker = request.json.get('ticker')
-    ticker = ticker.upper()
-    if not ticker:
-        return jsonify({"error": "No ticker provided"}), 400
+    data = request.get_json(silent=True) or {}
+    ticker = data.get('ticker') if isinstance(data, dict) else None
+    if not isinstance(ticker, str) or not ticker.strip():
+        return jsonify({"error": "A ticker is required"}), 400
+    ticker = ticker.strip().upper()
 
     price = stock_scraper.get_stock_price(ticker)
     if price:
@@ -193,12 +196,38 @@ def execute_trade():
     if current_user is None:
         return jsonify({'success': False, 'message': 'User not found'}), 404
 
-    data = request.get_json()
-    symbol = data['symbol'].upper()
-    shares = int(data['shares'])
-    trade_type = data['tradeType']  # 'buy' or 'sell'
-    order_type = data['orderType']  # 'market' or 'limit'
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'success': False, 'message': 'A JSON object is required'}), 400
+
+    symbol = data.get('symbol')
+    shares_raw = data.get('shares')
+    trade_type = data.get('tradeType')
+    order_type = data.get('orderType')
     limit_price = data.get('limitPrice')
+
+    if not isinstance(symbol, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.\\-]{0,14}', symbol):
+        return jsonify({'success': False, 'message': 'Invalid stock symbol'}), 400
+    symbol = symbol.upper()
+
+    # Reject negative, zero, fractional, and boolean quantities before modifying balances.
+    if isinstance(shares_raw, bool) or not re.fullmatch(r'[0-9]+', str(shares_raw)):
+        return jsonify({'success': False, 'message': 'Shares must be a positive whole number'}), 400
+    shares = int(shares_raw)
+    if shares <= 0:
+        return jsonify({'success': False, 'message': 'Shares must be greater than zero'}), 400
+
+    if trade_type not in ('buy', 'sell'):
+        return jsonify({'success': False, 'message': 'Invalid trade type'}), 400
+    if order_type not in ('market', 'limit'):
+        return jsonify({'success': False, 'message': 'Invalid order type'}), 400
+    if order_type == 'limit':
+        try:
+            limit_price = float(limit_price)
+        except (TypeError, ValueError):
+            return jsonify({'success': False, 'message': 'A valid limit price is required'}), 400
+        if not math.isfinite(limit_price) or limit_price <= 0:
+            return jsonify({'success': False, 'message': 'Limit price must be positive'}), 400
 
     current_price = stock_scraper.get_stock_price(symbol)
     if current_price is None:
