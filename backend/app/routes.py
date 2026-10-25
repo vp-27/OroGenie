@@ -28,12 +28,22 @@ stock_scraper = StockScraper(stock_tickers=['MSFT', 'TSLA', 'NVDA'])
 
 @bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(message="A JSON object is required"), 400
+
     email = data.get('email')
     password = data.get('password')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     portfolio_value = data.get('portfolio_value')
+
+    try:
+        portfolio_value = float(portfolio_value)
+    except (TypeError, ValueError):
+        return jsonify(message="Starting paper balance must be a number"), 400
+    if not math.isfinite(portfolio_value) or portfolio_value < 0:
+        return jsonify(message="Starting paper balance must be nonnegative"), 400
 
     if not is_valid_email(email):
         return jsonify(message="Invalid email address"), 400
@@ -48,7 +58,9 @@ def register():
 
 @bp.route('/login', methods=['POST'])
 def login():
-    data = request.json
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(message="A JSON object is required"), 400
     email = data.get('email')
     password = data.get('password')
 
@@ -213,6 +225,8 @@ def execute_trade():
     # Reject negative, zero, fractional, and boolean quantities before modifying balances.
     if isinstance(shares_raw, bool) or not re.fullmatch(r'[0-9]+', str(shares_raw)):
         return jsonify({'success': False, 'message': 'Shares must be a positive whole number'}), 400
+    if len(str(shares_raw)) > 10:
+        return jsonify({'success': False, 'message': 'Share quantity is too large'}), 400
     shares = int(shares_raw)
     if shares <= 0:
         return jsonify({'success': False, 'message': 'Shares must be greater than zero'}), 400
@@ -233,7 +247,12 @@ def execute_trade():
     if current_price is None:
         return jsonify({'success': False, 'message': 'Failed to fetch current stock price'}), 500
 
-    current_price = float(current_price)
+    try:
+        current_price = float(current_price)
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Invalid market price'}), 502
+    if not math.isfinite(current_price) or current_price <= 0:
+        return jsonify({'success': False, 'message': 'Invalid market price'}), 502
 
     if order_type == 'limit' and limit_price is not None:
         limit_price = float(limit_price)
